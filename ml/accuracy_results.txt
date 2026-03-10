@@ -1,0 +1,21 @@
+﻿[train] Loading dataset...
+[train] Loaded 50000 rows.
+[train] Training XGBoost model...
+[0]	validation_0-logloss:0.60517
+[50]	validation_0-logloss:0.49102
+[100]	validation_0-logloss:0.48471
+[150]	validation_0-logloss:0.48485
+[200]	validation_0-logloss:0.48571
+[250]	validation_0-logloss:0.48701
+[299]	validation_0-logloss:0.48791
+[train] Test AUC-ROC: 0.7864
+              precision    recall  f1-score   support
+
+           0       0.79      0.92      0.85      6983
+           1       0.69      0.42      0.52      3017
+
+    accuracy                           0.77     10000
+   macro avg       0.74      0.67      0.68     10000
+weighted avg       0.76      0.77      0.75     10000
+
+[train] Model saved to C:\Users\samarthby\Downloads\Practise\Policy Renewal Predictor\ml\model\churn_model.pkl
