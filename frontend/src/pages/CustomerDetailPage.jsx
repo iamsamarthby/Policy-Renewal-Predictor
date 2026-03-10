@@ -21,6 +21,31 @@ function DetailRow({ label, value }) {
     );
 }
 
+function renderStrategyText(text) {
+    if (!text) return null;
+    return text.split('\n').map((line, i) => {
+        if (line.trim() === '') return <br key={i} />;
+
+        // Match the heading and capture the rest of the line as content
+        const headingRegex = /^(\d+\.\s+.*?:|Root Cause:|Three Retention Actions:|Communication Channel & Timing:|Offer\/Discount Recommendation:|Historical Insight:)(.*)$/i;
+        const match = line.trim().match(headingRegex);
+
+        if (match) {
+            const heading = match[1];
+            const content = match[2].trim();
+
+            return (
+                <div key={i}>
+                    <div className="strategy-heading">{heading}</div>
+                    {content && <div className="strategy-body">{content}</div>}
+                </div>
+            );
+        }
+
+        return <div key={i} className="strategy-body">{line}</div>;
+    });
+}
+
 export default function CustomerDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -30,6 +55,7 @@ export default function CustomerDetailPage() {
     const [loading, setLoading] = useState(true);
     const [predicting, setPredicting] = useState(false);
     const [generating, setGenerating] = useState(false);
+    const [strategyError, setStrategyError] = useState(null);
 
     useEffect(() => {
         fetchCustomerById(id).then(r => {
@@ -54,10 +80,13 @@ export default function CustomerDetailPage() {
 
     const handleStrategy = async () => {
         setGenerating(true);
+        setStrategyError(null);
         try {
             const r = await generateStrategy(id);
             setStrategy(r.data);
-        } catch (e) { alert('Strategy generation failed: ' + e.message); }
+        } catch (e) {
+            setStrategyError(e.response?.data?.error || e.message);
+        }
         finally { setGenerating(false); }
     };
 
@@ -139,14 +168,21 @@ export default function CustomerDetailPage() {
             </div>
 
             {/* LLM Strategy */}
-            {(strategy || generating) && (
+            {(strategy || generating || strategyError) && (
                 <div className="card">
                     <div className="card-title"><Shield size={14} style={{ display: 'inline', marginRight: 6 }} />Engagement Strategy</div>
                     {generating ? (
                         <div className="loading-state"><div className="spinner" /><p>Generating personalised strategy...</p></div>
-                    ) : (
-                        <div className="strategy-text">{strategy.strategy_text}</div>
-                    )}
+                    ) : strategyError ? (
+                        <div className="error-banner" style={{ background: 'rgba(248,81,73,0.15)', color: 'var(--high)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(248,81,73,0.4)', marginTop: '12px', fontSize: '14px', lineHeight: '1.6' }}>
+                            <strong>⚠️ Generation Failed:</strong>
+                            <div style={{ marginTop: '8px', whiteSpace: 'pre-wrap' }}>{strategyError}</div>
+                        </div>
+                    ) : strategy ? (
+                        <div className="strategy-text">
+                            {renderStrategyText(strategy.strategy_text)}
+                        </div>
+                    ) : null}
                 </div>
             )}
         </div>

@@ -16,4 +16,8 @@ async function getLatestStrategy(customer_id) {
     return rows[0] || null;
 }
 
-module.exports = { saveStrategy, getLatestStrategy };
+async function clearAllStrategies() {
+    await pool.execute('TRUNCATE TABLE strategies');
+}
+
+module.exports = { saveStrategy, getLatestStrategy, clearAllStrategies };

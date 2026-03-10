@@ -1,7 +1,7 @@
 const csvLoader = require('../config/csvLoader');
 const strategyModel = require('../models/strategyModel');
 const predictionModel = require('../models/predictionModel');
-const ollamaService = require('../services/ollamaService');
+const geminiService = require('../services/geminiService');
 const chromaService = require('../services/chromaService');
 
 
@@ -34,7 +34,7 @@ const generateStrategy = async (req, res) => {
             // ChromaDB optional — don't fail if not running
         }
 
-        const strategy_text = await ollamaService.generateStrategy({
+        const strategy_text = await geminiService.generateStrategy({
             customer,
             risk_level,
             churn_prob,

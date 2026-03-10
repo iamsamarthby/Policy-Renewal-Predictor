@@ -6,6 +6,7 @@ const { loadCSV } = require('./config/csvLoader');
 const customerRoutes = require('./routes/customerRoutes');
 const predictionRoutes = require('./routes/predictionRoutes');
 const strategyRoutes = require('./routes/strategyRoutes');
+const strategyModel = require('./models/strategyModel');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -30,6 +31,12 @@ app.use((err, req, res, next) => {
 
 // ── Start server ─────────────────────────────────────────────────────────────
 async function start() {
+    console.log('[server] Clearing past strategies from database...');
+    try {
+        await strategyModel.clearAllStrategies();
+    } catch (e) {
+        console.warn('Failed to clear strategies. They might just not exist yet.', e);
+    }
     console.log('[server] Loading CSV data into memory...');
     loadCSV(); // synchronous — blocks until ready
     app.listen(PORT, () => {

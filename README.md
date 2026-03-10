@@ -11,7 +11,7 @@ The application offers an intuitive and dynamic React dashboard to visualize key
 - **Frontend**: React, Vite, TailwindCSS (or custom CSS), Recharts, React Router
 - **Backend**: Node.js, Express, MySQL (for saving predictions and strategies)
 - **Machine Learning**: Python, Flask, XGBoost, scikit-learn, pandas
-- **Generative AI**: Local LLM via Ollama (`phi3`, `llama3`, or `mistral`)
+- **Generative AI**: Google Gemini AI (`gemini-2.5-flash`)
 - **Vector Database (Optional)**: ChromaDB (for Retrieval-Augmented Generation / context retrieval)
 
 ## Architecture
@@ -26,7 +26,7 @@ This project is built using a microservices-inspired architecture:
 - [Node.js](https://nodejs.org/) v18+
 - [Python](https://python.org/) 3.10+
 - [MySQL](https://mysql.com/) 8+ (or XAMPP)
-- [Ollama](https://ollama.com/) (Must be installed and running locally)
+- [Google Gemini API Key](https://aistudio.google.com/)
 
 ### 1. Database Configuration
 1. Start your MySQL Server.
@@ -37,8 +37,7 @@ This project is built using a microservices-inspired architecture:
 3. Navigate to the `backend` directory and create a `.env` file (if not present) with your credentials:
    ```env
    DB_PASSWORD=your_mysql_password
-   OLLAMA_URL=http://localhost:11434
-   OLLAMA_MODEL=phi3
+   GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
 ### 2. Machine Learning Service (Python)
@@ -80,7 +79,7 @@ This project is built using a microservices-inspired architecture:
 - **Dashboard Overview**: Macro-level analytical views on region-based churn, policy risk distributions, and overall customer KPIs.
 - **Customer Directory**: Browse and filter safely loaded customer data derived from the dataset.
 - **Data Entry**: Add new customers systematically and dynamically calculate predictions for them.
-- **AI-Powered Strategies**: In-depth strategy generation based on exact customer features (using local LLMs via Ollama).
+- **AI-Powered Strategies**: In-depth strategy generation based on exact customer features (using Google Gemini).
 
 ## Git Commit Guidelines
 When pushing this repository, specific files and directories are ignored (refer to `.gitignore`) to protect credentials and prevent the upload of excessive build sizes:

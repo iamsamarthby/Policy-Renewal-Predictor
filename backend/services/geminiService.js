@@ -1,13 +1,19 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 require('dotenv').config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const MODEL = 'gemini-2.5-flash-lite';
+
+// Initialize the client
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 /**
- * Generate a personalised engagement strategy using Google Gemini.
+ * Generate a personalised engagement strategy for a customer using Gemini.
  */
 async function generateStrategy({ customer, risk_level, churn_prob, ragContext }) {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    if (!GEMINI_API_KEY) {
+        throw new Error('GEMINI_API_KEY is not configured in environment variables.');
+    }
 
     const premChange = (parseFloat(customer.premium_change_pct) * 100).toFixed(1);
 
@@ -18,16 +24,27 @@ Tenure: ${customer.customer_tenure_months} months | Premium change: ${premChange
 Late payments: ${customer.late_payment_count_12m} | Claims: ${customer.num_claims_12m} (rejected: ${customer.num_rejected_claims_12m})
 Complaint: ${customer.complaint_flag ? 'YES' : 'No'} | Quote requested: ${customer.quote_requested_flag ? 'YES' : 'No'} | Autopay: ${customer.autopay_enabled ? 'Yes' : 'No'}
 Churn risk: ${risk_level} (${churn_prob}%) | Likely reason: ${customer.churn_type}
-${ragContext && ragContext !== 'No similar customers found.' ? `\nSimilar churned customers context:\n${ragContext}` : ''}
 
-Write a retention strategy with these 4 sections (keep it brief):
-1. Root Cause (1-2 sentences)
-2. Three Retention Actions (numbered)
-3. Communication Channel & Timing
-4. Offer/Discount Recommendation`;
+**Similar Past Customer Context:**
+${ragContext}
 
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+Write a retention strategy with these 5 sections (keep it brief). IMPORTANT: Do NOT use any Markdown formatting, bold text, or asterisks (* or **). Use plain text only, separated by newlines:
+1. Root Cause: (1-2 sentences)
+2. Three Retention Actions: (numbered)
+3. Communication Channel & Timing:
+4. Offer/Discount Recommendation:
+5. Historical Insight: (Summarize how the "Similar Past Customer Context" above informed this strategy)`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: MODEL,
+            contents: prompt,
+        });
+
+        return response.text;
+    } catch (e) {
+        throw new Error(`Gemini Error: ${e.message}`);
+    }
 }
 
 module.exports = { generateStrategy };
